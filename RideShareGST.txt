@@ -1,0 +1,124 @@
+"================ RIDE CLASS ================"
+Object subclass: Ride [
+    | rideID pickup dropoff distance rideType fare |
+    
+    Ride class >> newWithId: id pickup: pu dropoff: do distance: dist type: type [
+        | newRide |
+        newRide := self new.
+        newRide rideID: id.
+        newRide pickup: pu.
+        newRide dropoff: do.
+        newRide distance: dist.
+        newRide rideType: type.
+        ^newRide
+    ]
+    
+    rideID: id [ rideID := id ]
+    pickup: pu [ pickup := pu ]
+    dropoff: do [ dropoff := do ]
+    distance: dist [ distance := dist ]
+    rideType: type [ rideType := type ]
+    fare: f [ fare := f ]
+    
+    calculateFare [
+        rideType = 'Standard'
+            ifTrue: [fare := distance * 2]
+            ifFalse: [fare := (distance * 3) + 2.5].
+        ^fare
+    ]
+    
+    rideDetails [
+        ^'Ride ID: ', rideID asString, '
+Pickup: ', pickup, '
+Dropoff: ', dropoff, '
+Distance: ', distance asString, ' miles
+Ride Type: ', rideType, '
+Fare: $', fare asString
+    ]
+]
+
+"================ RIDER CLASS ================"
+Object subclass: Rider [
+    | riderID name rides |
+    
+    Rider class >> newWithId: id name: nm [
+        | newRider |
+        newRider := self new.
+        newRider riderID: id.
+        newRider name: nm.
+        newRider rides: OrderedCollection new.
+        ^newRider
+    ]
+    
+    riderID: id [ riderID := id ]
+    name: nm [ name := nm ]
+    rides: r [ rides := r ]
+    
+    addRide: ride [ rides add: ride ]
+    
+    rideHistory [
+        | output |
+        output := 'Rider ID: ', riderID asString, '
+Name: ', name, '
+Requested Rides:
+'.
+        rides do: [:ride |
+            output := output, ride rideDetails, '
+----------------------
+'].
+        ^output
+    ]
+]
+
+"================ DRIVER CLASS ================"
+Object subclass: Driver [
+    | driverID name rating rides |
+    
+    Driver class >> newWithId: id name: nm rating: rt [
+        | newDriver |
+        newDriver := self new.
+        newDriver driverID: id.
+        newDriver name: nm.
+        newDriver rating: rt.
+        newDriver rides: OrderedCollection new.
+        ^newDriver
+    ]
+    
+    driverID: id [ driverID := id ]
+    name: nm [ name := nm ]
+    rating: rt [ rating := rt ]
+    rides: r [ rides := r ]
+    
+    addRide: ride [ rides add: ride ]
+    
+    driverInfo [
+        ^'Driver ID: ', driverID asString, '
+Name: ', name, '
+Rating: ', rating asString, '
+Total Rides: ', rides size asString
+    ]
+]
+
+"================ DEMONSTRATION ================"
+| rider driver ride1 ride2 |
+
+"Create participants"
+rider := Rider newWithId: 1 name: 'Alice'.
+driver := Driver newWithId: 101 name: 'Bob' rating: 4.8.
+
+"Create and calculate rides"
+ride1 := Ride newWithId: 1001 pickup: 'Downtown' dropoff: 'Airport' distance: 10 type: 'Standard'.
+ride1 calculateFare.
+
+ride2 := Ride newWithId: 1002 pickup: 'Mall' dropoff: 'Stadium' distance: 5 type: 'Premium'.
+ride2 calculateFare.
+
+"Assign rides"
+rider addRide: ride1.
+rider addRide: ride2.
+driver addRide: ride1.
+driver addRide: ride2.
+
+"Display output"
+rider rideHistory displayNl.
+driver driverInfo displayNl.
